@@ -36,7 +36,10 @@ kfold = KFold(n_splits=5, shuffle=True)
 for i, (train, test) in enumerate(kfold.split(X_tr)):
     model = Sequential()
     # Input Layer
-    model.add(Dense(10, activation='relu', input_dim=784))
+    model.add(Dense(784, activation='relu', input_dim=784))
+
+    # Second Hidden Layer
+    model.add(Dense(1000, activation='relu'))
 
     # Output Layer
     model.add(Dense(10, activation='softmax'))
@@ -47,22 +50,22 @@ for i, (train, test) in enumerate(kfold.split(X_tr)):
 
 
     model.summary()
-    p = keras.optimizers.SGD(lr=0.001, momentum=0.2, decay=0.0, nesterov=False)
+    p = keras.optimizers.SGD(lr=0.1, momentum=0.6, decay=0.0, nesterov=False)
 
-    model.compile(loss='sparse_categorical_crossentropy', optimizer=p, metrics=['accuracy'])
-    fitness = model.fit(X_tr, Y_tr, validation_data=(X_ts, Y_ts), epochs=50, batch_size=500, verbose=1)
+    model.compile(loss='mean_squared_error', optimizer=p, metrics=['accuracy'])#mean_squared_error
+    fitness = model.fit(X_tr, Y_tr, validation_data=(X_ts, Y_ts), epochs=50, batch_size=500, verbose=1)#sparse_categorical_crossentropy
 
     scores = model.evaluate(X_ts, Y_ts, verbose=1)
 
     rmseList.append(scores[0])
-    print("Fold :", i, " MSE:", scores[0])
+    print("Fold :", i, " CE:", scores[0])
 
     predict = model.predict(X_ts)
     print(scores)
 
     print('Accuracy: %.2f' % (scores[0] * 100))
 
-print("MSE: ", np.mean(rmseList))
+print("CE: ", np.mean(rmseList))
 
 history = fitness.history
 
